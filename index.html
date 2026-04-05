@@ -338,6 +338,7 @@ $testimonials = $conn->query("SELECT * FROM testimonials ORDER BY id DESC");
     <div class="container position-relative d-flex align-items-center justify-content-between">
 
       <a href="index.php" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="assets/img/fish.jpeg" width="100%" alt="">
         <h1 class="sitename">FishNation</h1><span style="color:#7ef29d;">.</span>
       </a>
 
@@ -347,16 +348,7 @@ $testimonials = $conn->query("SELECT * FROM testimonials ORDER BY id DESC");
           <li><a href="#about">About</a></li>
           <li><a href="#services">Fishlings</a></li>
           <li><a href="shop.php">Shop</a></li>
-          <li><a href="#testimonials">Testimonials</a></li>
-          <li><a href="#contact">Contact</a></li>
-
-          <?php if(isset($_SESSION['user_id'])): ?>
-            <li><a href="checkout.php">Cart</a></li>
-            <li><a href="logout.php">Logout</a></li>
-          <?php else: ?>
-            <li><a href="login.php">Login</a></li>
-            <li><a href="register.php">Register</a></li>
-          <?php endif; ?>
+         
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -514,7 +506,8 @@ $testimonials = $conn->query("SELECT * FROM testimonials ORDER BY id DESC");
           <div class="col-lg-4 col-md-6">
             <div class="service-card">
               <div class="shop-image-wrap">
-                    <img src="uploads/<?php echo htmlspecialchars($row['image']); ?>" alt="<?php echo htmlspecialchars($row['fish_name']); ?>">
+                    <!-- <img src="uploads/<?php echo htmlspecialchars($row['image']); ?>" alt="<?php echo htmlspecialchars($row['fish_name']); ?>"> -->
+                 <img src="uploads/raw-fish-market.jpg" width="100%" alt="">
                   </div>
 
               <h3><?php echo htmlspecialchars($row['fish_name']); ?></h3>
