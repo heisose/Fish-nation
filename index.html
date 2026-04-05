@@ -1,0 +1,880 @@
+<?php
+include('config/db.php');
+
+
+$products = $conn->query("SELECT * FROM products WHERE stock_status != 'Out of Stock' ORDER BY id DESC LIMIT 6");
+$testimonials = $conn->query("SELECT * FROM testimonials ORDER BY id DESC");
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>FishNation - Premium Fishlings</title>
+  <meta name="description" content="Healthy, disease-free fishlings for farmers across Nigeria.">
+  <meta name="keywords" content="fishlings, catfish, juveniles, fish farm, aquaculture, FishNation">
+
+  <!-- Favicons -->
+  <link href="assets/img/fish.jpeg" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Raleway:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --accent-color: #1f7a3d;
+      --accent-color-dark: #14532d;
+      --accent-color-light: #2f9e57;
+      --bg-dark: #081c15;
+      --bg-deep: #0b2d1f;
+      --bg-soft: #123524;
+      --text-light: #e8f5e9;
+      --text-muted: #b7d3bf;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border-soft: rgba(255, 255, 255, 0.08);
+    }
+
+    body {
+      background: linear-gradient(180deg, #07150f 0%, #0b2418 50%, #0f2d1f 100%);
+      color: var(--text-light);
+      font-family: 'Inter', sans-serif;
+    }
+
+    h1, h2, h3, h4, h5, h6,
+    .sitename,
+    .section-title h2,
+    .hero-headline {
+      font-family: 'Raleway', sans-serif;
+      color: #f4fff6 !important;
+    }
+
+    p, span, li, a, label, input, textarea, select {
+      color: var(--text-muted);
+    }
+
+    .header {
+      background: rgba(7, 21, 15, 0.85) !important;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .navmenu a,
+    .navmenu a:focus {
+      color: #d8f3dc !important;
+      font-weight: 500;
+    }
+
+    .navmenu a:hover,
+    .navmenu .active {
+      color: #7ef29d !important;
+    }
+
+    .btn-getstarted,
+    .btn-primary,
+    .btn-primary-custom,
+    .btn-main,
+    .btn-submit,
+    .hero-actions .btn-primary {
+      background: linear-gradient(135deg, #1f7a3d, #2f9e57) !important;
+      border: none !important;
+      color: white !important;
+      border-radius: 14px !important;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(31, 122, 61, 0.25);
+    }
+
+    .btn-outline,
+    .hero-actions .btn-outline {
+      border: 1px solid rgba(126, 242, 157, 0.35) !important;
+      color: #d8f3dc !important;
+      background: transparent !important;
+      border-radius: 14px !important;
+    }
+
+    .btn-outline:hover {
+      background: rgba(126, 242, 157, 0.08) !important;
+    }
+
+    .hero {
+      background:
+        radial-gradient(circle at top right, rgba(47, 158, 87, 0.18), transparent 35%),
+        radial-gradient(circle at top left, rgba(31, 122, 61, 0.2), transparent 40%),
+        linear-gradient(180deg, #081c15 0%, #0b2418 100%);
+    }
+
+    .hero-tag,
+    .section-badge,
+    .member-badge {
+      background: rgba(126, 242, 157, 0.1) !important;
+      color: #98f5b3 !important;
+      border: 1px solid rgba(126, 242, 157, 0.18);
+    }
+
+    .hero-text,
+    .lead-text,
+    .description,
+    .section-title p {
+      color: #cfe8d5 !important;
+    }
+
+    .stat-card,
+    .feature-box,
+    .service-card,
+    .team-card,
+    .testimonial-item,
+    .form-card,
+    .info-panel,
+    .capability-card,
+    .feature-card,
+    .stat-box,
+    .box,
+    .footer-newsletter,
+    .about-images-wrapper,
+    .sidebar-content {
+      background: rgba(255, 255, 255, 0.045) !important;
+      border: 1px solid var(--border-soft);
+      border-radius: 24px !important;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .service-card {
+      padding: 30px 25px;
+      margin-bottom: 25px;
+      height: 100%;
+      transition: 0.3s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(126, 242, 157, 0.18);
+    }
+
+    .service-card h3,
+    .feature-content h4,
+    .member-info h4,
+    .form-card-header h4,
+    .panel-header h3,
+    .footer h4 {
+      color: #f1fff3 !important;
+    }
+
+    .icon-wrapper,
+    .feature-icon,
+    .method-icon,
+    .header-icon,
+    .capability-icon,
+    .icon-box,
+    .stat-icon-wrap {
+      background: linear-gradient(135deg, #1f7a3d, #2f9e57) !important;
+      color: white !important;
+      border-radius: 16px;
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 10px 20px rgba(31,122,61,0.2);
+    }
+
+    .service-link,
+    .feature-link,
+    .legal-links a,
+    .footer-links a,
+    .social-links a,
+    .social-icons a,
+    .contact-info a {
+      color: #9cf0b3 !important;
+    }
+
+    .service-link:hover,
+    .feature-link:hover,
+    .footer-links a:hover,
+    .legal-links a:hover {
+      color: #ffffff !important;
+    }
+
+    .badge.bg-success {
+      background: #1f7a3d !important;
+      color: white !important;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .input-wrapper,
+    input,
+    textarea,
+    select,
+    .form-control {
+      background: rgba(255,255,255,0.05) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      color: #f4fff6 !important;
+      border-radius: 14px !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #b7d3bf !important;
+    }
+
+    .contact,
+    .why-us,
+    .about,
+    .services,
+    .team,
+    .testimonials,
+    .section,
+    .light-background,
+    footer {
+      background: transparent !important;
+    }
+
+    .section-title h2::after {
+      background: linear-gradient(90deg, #1f7a3d, #7ef29d) !important;
+    }
+
+    .testimonial-item {
+      padding: 30px;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .testimonial-item p {
+      font-size: 17px;
+      line-height: 1.8;
+      color: #d8f3dc !important;
+    }
+
+    .quote-icon-left,
+    .quote-icon-right {
+      color: #7ef29d !important;
+    }
+
+    .stats-strip,
+    .stats-wrapper,
+    .team-stats,
+    .stat-cards {
+      background: rgba(255,255,255,0.04);
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat-number,
+    .stat-value,
+    .number,
+    .years {
+      color: #7ef29d !important;
+      font-weight: 800;
+    }
+
+    .footer {
+      background: #06120d !important;
+      color: #d8f3dc !important;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer .sitename,
+    .footer strong,
+    .footer h4 {
+      color: white !important;
+    }
+
+    .footer input {
+      background: rgba(255,255,255,0.06) !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+      color: white !important;
+    }
+
+    .btn-subscribe {
+      background: linear-gradient(135deg, #1f7a3d, #2f9e57) !important;
+      border: none !important;
+      color: white !important;
+    }
+
+    .scroll-top {
+      background: #1f7a3d !important;
+    }
+
+    .mobile-nav-toggle {
+      color: white !important;
+    }
+
+    .section-title p,
+    .feature-card span,
+    .method-details span,
+    .member-info p,
+    .stat-label,
+    .stat-text,
+    .capability-card p {
+      color: #cfe8d5 !important;
+    }
+
+    img {
+      border-radius: 20px;
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.php" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="sitename">FishNation</h1><span style="color:#7ef29d;">.</span>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="#hero" class="active">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Fishlings</a></li>
+          <li><a href="shop.php">Shop</a></li>
+          <li><a href="#testimonials">Testimonials</a></li>
+          <li><a href="#contact">Contact</a></li>
+
+          <?php if(isset($_SESSION['user_id'])): ?>
+            <li><a href="checkout.php">Cart</a></li>
+            <li><a href="logout.php">Logout</a></li>
+          <?php else: ?>
+            <li><a href="login.php">Login</a></li>
+            <li><a href="register.php">Register</a></li>
+          <?php endif; ?>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted px-3 py-2" href="https://wa.me/234XXXXXXXXXX?text=Hello%20FishNation,%20I%20want%20to%20order%20fishlings" target="_blank">
+        Order via WhatsApp
+      </a>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Hero -->
+    <section id="hero" class="hero section">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row align-items-center gy-5">
+
+          <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
+            <div class="hero-content">
+              <div class="hero-tag mb-3 px-3 py-2 d-inline-flex align-items-center rounded-pill">
+                <span class="tag-dot me-2"></span>
+                <span class="tag-text">Disease-Free Fishlings</span>
+              </div>
+
+              <h1 class="hero-headline">
+                Healthy Fishlings.<br>Predictable Results.
+              </h1>
+
+              <p class="hero-text">
+                FishNation supplies healthy, fast-growing fishlings to farmers who want lower mortality,
+                better survival rates, and profitable fish production.
+              </p>
+
+              <div class="hero-actions d-flex gap-3 flex-wrap mt-4">
+                <a href="#services" class="btn btn-primary px-4 py-3">View Available Fish</a>
+                <a href="shop.php" class="btn btn-outline px-4 py-3">Shop All</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6" data-aos="fade-left" data-aos-delay="300">
+            <div class="stats-grid">
+              <div class="stat-card stat-card-primary mb-3 p-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="stat-icon-wrap"><i class="bi bi-droplet-half"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value d-block">92%</span>
+                    <span class="stat-title">Survival Rate</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stat-card mb-3 p-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="stat-icon-wrap"><i class="bi bi-truck"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value d-block">Fast</span>
+                    <span class="stat-title">Live Delivery</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stat-card mb-3 p-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="stat-icon-wrap"><i class="bi bi-shield-check"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value d-block">Healthy</span>
+                    <span class="stat-title">Quality Assured</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-card-accent p-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="stat-icon-wrap"><i class="bi bi-people"></i></div>
+                  <div class="stat-info">
+                    <span class="stat-value d-block">Trusted</span>
+                    <span class="stat-title">By Farmers</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="about section">
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-5 align-items-center">
+
+          <div class="col-xl-6" data-aos="fade-right" data-aos-delay="200">
+            <div class="about-images-wrapper p-3">
+              <div class="image-main">
+                <img src="assets/img/raw-fish-market-counter.jpg" alt="FishNation Fish Farm" class="img-fluid">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xl-6" data-aos="fade-left" data-aos-delay="300">
+            <div class="about-content">
+              <div class="section-subtitle" style="color:#7ef29d;">Who We Are</div>
+              <h2>Reliable Fish Supply for Serious Farmers</h2>
+              <p class="lead-text">
+                FishNation exists to help fish farmers grow with confidence through premium fishlings,
+                expert guidance, and dependable delivery.
+              </p>
+              <p class="mb-4 description">
+                Whether you are stocking a new pond or scaling production, we provide strong and healthy fishlings
+                that support better growth performance and reduced losses.
+              </p>
+
+              <div class="features-grid">
+                <div class="feature-card"><i class="bi bi-check-circle-fill"></i> <span>Healthy Stock</span></div>
+                <div class="feature-card"><i class="bi bi-check-circle-fill"></i> <span>Fast Delivery</span></div>
+                <div class="feature-card"><i class="bi bi-check-circle-fill"></i> <span>Farmer Support</span></div>
+                <div class="feature-card"><i class="bi bi-check-circle-fill"></i> <span>Trusted Quality</span></div>
+              </div>
+
+              <div class="stats-row mt-4 d-flex gap-3 flex-wrap">
+                <div class="stat-box p-3 text-center">
+                  <span class="number d-block">1000+</span>
+                  <span class="label">Fishlings Supplied</span>
+                </div>
+                <div class="stat-box p-3 text-center">
+                  <span class="number d-block">Growing</span>
+                  <span class="label">Farmer Network</span>
+                </div>
+                <div class="stat-box p-3 text-center">
+                  <span class="number d-block">Reliable</span>
+                  <span class="label">Support System</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Products -->
+    <section id="services" class="services section">
+      <div class="container section-title">
+        <h2>Available Fishlings</h2>
+        <p>Healthy, disease-free stock ready for delivery</p>
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <?php while($row = $products->fetch_assoc()): ?>
+          <div class="col-lg-4 col-md-6">
+            <div class="service-card">
+              <div class="shop-image-wrap">
+                    <img src="uploads/<?php echo htmlspecialchars($row['image']); ?>" alt="<?php echo htmlspecialchars($row['fish_name']); ?>">
+                  </div>
+
+              <h3><?php echo htmlspecialchars($row['fish_name']); ?></h3>
+
+              <p><strong>Species:</strong> <?php echo htmlspecialchars($row['species']); ?></p>
+              <p><strong>Size:</strong> <?php echo htmlspecialchars($row['size_category']); ?></p>
+              <p><strong>Weight:</strong> <?php echo htmlspecialchars($row['weight_range']); ?></p>
+
+              <p>
+                <strong>Price:</strong>
+                ₦<?php echo number_format($row['price_min']); ?> - ₦<?php echo number_format($row['price_max']); ?>
+              </p>
+
+              <p>
+                <strong>Status:</strong>
+                <span class="badge bg-success"><?php echo htmlspecialchars($row['stock_status']); ?></span>
+              </p>
+
+              <?php if(isset($_SESSION['user_id'])): ?>
+                <a href="cart-actions.php?add=<?php echo $row['id']; ?>" class="service-link">
+                  Add to Cart <i class="bi bi-arrow-right"></i>
+                </a>
+              <?php else: ?>
+                <a href="login.php" class="service-link">
+                  Login to Order <i class="bi bi-arrow-right"></i>
+                </a>
+              <?php endif; ?>
+            </div>
+          </div>
+          <?php endwhile; ?>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="shop.html" class="btn btn-primary px-4 py-3">View All Fish</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Us -->
+    <section id="why-us" class="why-us section light-background">
+      <div class="container section-title" data-aos="fade-up">
+        <h2>Why Farmers Choose FishNation</h2>
+        <p>Because survival rate, stock quality, and trust matter.</p>
+      </div>
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row g-5">
+          <div class="col-lg-5" data-aos="fade-right" data-aos-delay="200">
+            <div class="sidebar-content p-4">
+              <div class="badge-wrapper mb-3">
+                <span class="section-badge"><i class="bi bi-stars"></i> Our Difference</span>
+              </div>
+              <h2>Built Around Fish Farming Success</h2>
+              <p class="description">
+                We focus on practical value — healthier stock, smoother ordering, and support that helps farmers make better production decisions.
+              </p>
+
+              <div class="stat-cards mt-4">
+                <div class="stat-card mb-3 p-3">
+                  <div class="stat-value">Live</div>
+                  <div class="stat-text">Delivery Support</div>
+                </div>
+                <div class="stat-card mb-3 p-3">
+                  <div class="stat-value">Healthy</div>
+                  <div class="stat-text">Fishlings Guaranteed</div>
+                </div>
+                <div class="stat-card p-3">
+                  <div class="stat-value">Trusted</div>
+                  <div class="stat-text">By Returning Buyers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7" data-aos="fade-left" data-aos-delay="200">
+            <div class="features-grid">
+              <div class="feature-box highlight p-4 mb-4">
+                <div class="feature-icon mb-3"><i class="bi bi-shield-check"></i></div>
+                <div class="feature-content">
+                  <h4>Healthy Stock Selection</h4>
+                  <p>Every fishling category is selected to help farmers reduce losses and improve growth performance.</p>
+                </div>
+              </div>
+
+              <div class="feature-box p-4 mb-4">
+                <div class="feature-icon mb-3"><i class="bi bi-truck"></i></div>
+                <div class="feature-content">
+                  <h4>Reliable Delivery</h4>
+                  <p>We make sure your fishlings reach you quickly and in the best possible condition.</p>
+                </div>
+              </div>
+
+              <div class="feature-box p-4">
+                <div class="feature-icon mb-3"><i class="bi bi-chat-dots"></i></div>
+                <div class="feature-content">
+                  <h4>Farmer Guidance</h4>
+                  <p>Need help choosing fish size or quantity? FishNation helps you make informed buying decisions.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="testimonials section">
+      <div class="container section-title">
+        <h2>What Farmers Say</h2>
+        <p>Real feedback from real buyers</p>
+      </div>
+
+      <div class="container">
+        <?php while($row = $testimonials->fetch_assoc()): ?>
+          <div class="testimonial-item">
+            <p>
+              <i class="bi bi-quote quote-icon-left"></i>
+              <?php echo htmlspecialchars($row['content']); ?>
+              <i class="bi bi-quote quote-icon-right"></i>
+            </p>
+          </div>
+        <?php endwhile; ?>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="contact section">
+      <div class="container section-title">
+        <h2>Contact FishNation</h2>
+        <p>We’re here to help you grow your fish farming business with confidence.</p>
+      </div>
+
+      <div class="container">
+        <div class="row gy-5 align-items-stretch">
+
+          <div class="col-lg-5">
+            <div class="info-panel p-4 h-100">
+              <div class="panel-header mb-4">
+                <span class="section-badge">
+                  <i class="bi bi-chat-dots-fill"></i> Get In Touch
+                </span>
+
+                <h3 class="mt-3">Let’s Grow Your Fish Business</h3>
+
+                <p>
+                  Need healthy fishlings or advice? Reach out to FishNation and let’s help you reduce mortality and increase profits.
+                </p>
+              </div>
+
+              <div class="contact-methods">
+                <div class="method-item d-flex gap-3 mb-4">
+                  <div class="method-icon"><i class="bi bi-envelope-paper-fill"></i></div>
+                  <div class="method-details">
+                    <span class="method-label d-block">Email Us</span>
+                    <a href="mailto:info@fishnation.ng">info@fishnation.ng</a>
+                  </div>
+                </div>
+
+                <div class="method-item d-flex gap-3 mb-4">
+                  <div class="method-icon"><i class="bi bi-headset"></i></div>
+                  <div class="method-details">
+                    <span class="method-label d-block">Call Us</span>
+                    <a href="tel:+234XXXXXXXXXX">+234 XXX XXX XXXX</a>
+                  </div>
+                </div>
+
+                <div class="method-item d-flex gap-3 mb-4">
+                  <div class="method-icon"><i class="bi bi-whatsapp"></i></div>
+                  <div class="method-details">
+                    <span class="method-label d-block">WhatsApp</span>
+                    <a href="https://wa.me/234XXXXXXXXXX" target="_blank">Chat on WhatsApp</a>
+                  </div>
+                </div>
+
+                <div class="method-item d-flex gap-3">
+                  <div class="method-icon"><i class="bi bi-pin-map-fill"></i></div>
+                  <div class="method-details">
+                    <span class="method-label d-block">Location</span>
+                    <span>Nigeria</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="form-card p-4 h-100">
+              <div class="form-card-header d-flex align-items-center gap-3 mb-4">
+                <div class="header-icon"><i class="bi bi-send-fill"></i></div>
+                <div class="header-text">
+                  <h4>Send Us a Message</h4>
+                  <p>We typically respond within a few hours.</p>
+                </div>
+              </div>
+
+              <form action="actions/contact-submit.php" method="post">
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="input-group-custom">
+                      <label>Your Name</label>
+                      <div class="input-wrapper d-flex align-items-center px-3">
+                        <i class="bi bi-person me-2"></i>
+                        <input type="text" name="name" class="w-100 border-0 bg-transparent py-3" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="input-group-custom">
+                      <label>Email</label>
+                      <div class="input-wrapper d-flex align-items-center px-3">
+                        <i class="bi bi-envelope me-2"></i>
+                        <input type="email" name="email" class="w-100 border-0 bg-transparent py-3" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="input-group-custom">
+                      <label>Subject</label>
+                      <div class="input-wrapper d-flex align-items-center px-3">
+                        <i class="bi bi-chat-square-text me-2"></i>
+                        <input type="text" name="subject" class="w-100 border-0 bg-transparent py-3" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="input-group-custom">
+                      <label>Message</label>
+                      <div class="input-wrapper textarea-wrapper d-flex px-3">
+                        <i class="bi bi-pencil-square me-2 mt-3"></i>
+                        <textarea name="message" rows="5" class="w-100 border-0 bg-transparent py-3" required></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions mt-4">
+                  <button type="submit" class="btn-submit px-4 py-3">
+                    Send Message <i class="bi bi-arrow-right-circle-fill"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Payment -->
+    <section class="section py-5">
+      <div class="container">
+        <div class="service-card">
+          <h3>Payment Details</h3>
+          <p><strong>Bank Name:</strong> Your Bank</p>
+          <p><strong>Account Name:</strong> FishNation</p>
+          <p><strong>Account Number:</strong> 0123456789</p>
+          <p class="mt-3">Live delivery guaranteed or refund policy applies.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer light-background">
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-info">
+          <a href="index.php" class="logo d-flex align-items-center mb-4">
+            <span class="sitename">FishNation</span>
+          </a>
+          <p>
+            Premium fishlings, dependable delivery, and farmer-first support built for aquaculture success.
+          </p>
+
+          <div class="social-links d-flex mt-4">
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-whatsapp"></i></a>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#hero">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Fishlings</a></li>
+            <li><a href="shop.php">Shop</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-6 footer-links">
+          <h4>Customer</h4>
+          <ul>
+            <li><a href="login.php">Login</a></li>
+            <li><a href="register.php">Register</a></li>
+            <li><a href="checkout.php">Cart</a></li>
+            <li><a href="payment.php">Payment</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <div class="footer-newsletter p-4">
+            <h4>Stay Updated</h4>
+            <p>Get updates on available fishlings and new stock alerts.</p>
+            <form action="#" method="post">
+              <div class="position-relative">
+                <input type="email" name="email" placeholder="Your Email" required="" class="w-100 py-3 px-3 rounded-pill">
+                <button type="submit" class="btn-subscribe position-absolute top-0 end-0 h-100 px-4 rounded-pill border-0">
+                  <i class="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-bottom mt-4">
+      <div class="row gy-3">
+        <div class="col-md-6">
+          <div class="copyright">
+            <p>© <strong class="sitename">FishNation</strong>. All Rights Reserved.</p>
+          </div>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <div class="legal-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+</html>
