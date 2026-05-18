@@ -1,0 +1,679 @@
+<?php
+include('config/db.php');
+
+$products = $conn->query("SELECT * FROM products ORDER BY id DESC");
+
+$cart_count = 0;
+if (isset($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $item) {
+        $cart_count += $item['quantity'];
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop — FishNation</title>
+  <meta name="description" content="Browse healthy fingerlings available at FishNation">
+
+  <link href="assets/img/fish.jpeg" rel="icon">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Raleway:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --fn-dark:   #07150f;
+      --fn-green:  #45A80D;
+      --fn-lime:   #7ef29d;
+      --fn-card:   rgba(7,21,15,0.82);
+      --fn-border: rgba(69,168,13,0.22);
+      --fn-muted:  rgba(216,243,220,0.45);
+      --fn-text:   #d8f3dc;
+      --fn-gold:   #f0c040;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: #07150f;
+      color: var(--fn-text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    h1,h2,h3,h4,h5,h6 {
+      font-family: 'Raleway', sans-serif;
+      color: #fff;
+    }
+
+    /* ── Hero ── */
+    .shop-hero {
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(69,168,13,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(126,242,157,0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #0a2e14 0%, #07150f 100%);
+      padding: 80px 0 50px;
+      text-align: center;
+      border-bottom: 1px solid var(--fn-border);
+    }
+    .shop-hero .eyebrow {
+      display: inline-block;
+      background: rgba(69,168,13,0.15);
+      border: 1px solid rgba(69,168,13,0.3);
+      color: var(--fn-lime);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+    }
+    .shop-hero h1 {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .shop-hero h1 span { color: var(--fn-lime); }
+    .shop-hero p {
+      color: var(--fn-muted);
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 24px 0 0;
+    }
+    .filter-btn {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--fn-border);
+      background: transparent;
+      color: var(--fn-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--fn-green);
+      border-color: var(--fn-green);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ── Product card ── */
+    .shop-section { padding: 48px 0 80px; }
+
+    .product-card {
+      background: var(--fn-card);
+      border: 1px solid var(--fn-border);
+      border-radius: 20px;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(69,168,13,0.45);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.35);
+    }
+
+    .product-img-wrap {
+      height: 220px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .product-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .product-card:hover .product-img-wrap img { transform: scale(1.07); }
+
+    .stock-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .badge-in  { background: rgba(69,168,13,0.9);  color: #fff; }
+    .badge-low { background: rgba(240,120,48,0.9);  color: #fff; }
+    .badge-out { background: rgba(185,28,28,0.9);   color: #fff; }
+
+    .product-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(69,168,13,0.12);
+      border: 1px solid rgba(69,168,13,0.2);
+      color: var(--fn-lime);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .product-name {
+      font-family: 'Raleway', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .product-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+      font-size: 0.83rem;
+    }
+    .product-meta span {
+      color: var(--fn-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .product-meta span strong { color: var(--fn-text); }
+
+    .product-price {
+      font-family: 'Raleway', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--fn-lime);
+      margin-bottom: 16px;
+    }
+
+    .product-divider {
+      border: none;
+      border-top: 1px solid var(--fn-border);
+      margin: 0 0 16px;
+    }
+
+    .btn-addcart {
+      width: 100%;
+      padding: 12px;
+      background: var(--fn-green);
+      color: #fff;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+      margin-top: auto;
+    }
+    .btn-addcart:hover  { background: #3a9008; }
+    .btn-addcart:active { transform: scale(0.98); }
+    .btn-addcart.loading { opacity: 0.6; pointer-events: none; }
+    .btn-addcart.out-of-stock {
+      background: rgba(255,255,255,0.06);
+      color: rgba(216,243,220,0.3);
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    .btn-viewmore {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      color: var(--fn-lime);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 500;
+      border: 1px solid var(--fn-border);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      margin-top: 8px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-viewmore:hover {
+      border-color: var(--fn-green);
+      background: rgba(69,168,13,0.07);
+      color: var(--fn-lime);
+    }
+
+    /* ── Empty state ── */
+    .empty-box {
+      background: var(--fn-card);
+      border: 1px solid var(--fn-border);
+      border-radius: 20px;
+      padding: 60px 30px;
+      text-align: center;
+    }
+    .empty-box i { font-size: 48px; color: var(--fn-green); margin-bottom: 16px; display: block; }
+
+    /* ── Section heading ── */
+    .fn-section-head {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .fn-section-head .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--fn-green);
+      margin-bottom: 8px;
+    }
+    .fn-section-head h2 {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .fn-section-head p { color: var(--fn-muted); font-size: 0.9rem; }
+
+    /* ── Footer ── */
+    .fn-footer {
+      background: #040e08;
+      border-top: 1px solid var(--fn-border);
+      padding: 48px 0 24px;
+    }
+    .fn-footer h4 {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .fn-footer p, .fn-footer a, .fn-footer li {
+      color: var(--fn-muted);
+      font-size: 0.875rem;
+      text-decoration: none;
+      line-height: 1.9;
+      list-style: none;
+    }
+    .fn-footer a:hover { color: var(--fn-lime); }
+    .fn-footer ul { padding: 0; margin: 0; }
+    .fn-footer-bottom {
+      border-top: 1px solid var(--fn-border);
+      margin-top: 32px;
+      padding-top: 20px;
+      text-align: center;
+      color: var(--fn-muted);
+      font-size: 0.82rem;
+    }
+    .fn-footer .social-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(69,168,13,0.12);
+      border: 1px solid var(--fn-border);
+      color: var(--fn-lime);
+      font-size: 15px;
+      margin-right: 8px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .fn-footer .social-links a:hover {
+      background: var(--fn-green);
+      border-color: var(--fn-green);
+      color: #fff;
+    }
+
+    /* ── Scroll top ── */
+    .scroll-top { background: var(--fn-green) !important; }
+  </style>
+</head>
+
+<body>
+
+<?php
+$current_page = 'shop';
+include 'navbar.php';
+?>
+
+<main>
+
+  <!-- Hero -->
+  <section class="shop-hero">
+    <div class="container">
+      <span class="eyebrow"><i class="bi bi-droplet-fill"></i> Premium Fish Stock</span>
+      <h1>Available <span>Fingerlings</span></h1>
+      <p>Browse healthy, disease-free stock ready for stocking and delivery across Nigeria.</p>
+
+      <!-- Filter buttons -->
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All Stock</button>
+        <button class="filter-btn" data-filter="Fingerlings">Fingerlings</button>
+        <button class="filter-btn" data-filter="Juveniles">Juveniles</button>
+        <button class="filter-btn" data-filter="Post-Juveniles">Post-Juveniles</button>
+        <button class="filter-btn" data-filter="In Stock">In Stock Only</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="shop-section">
+    <div class="container">
+
+      <div class="fn-section-head" data-aos="fade-up">
+        <div class="eyebrow">FishNation Shop</div>
+        <h2 style="color: grey">Choose Your Stock</h2>
+        <p style="color: grey">Quality-checked fish selected for better survival and growth performance.</p>
+      </div>
+
+      <div class="row g-4" id="products-grid">
+
+        <?php if ($products && $products->num_rows > 0): ?>
+          <?php while ($row = $products->fetch_assoc()): ?>
+
+            <?php
+              $badgeClass = 'badge-in';
+              $btnClass   = '';
+              $btnText    = '<i class="bi bi-cart-plus-fill"></i> Add to Cart';
+              if (stripos($row['stock_status'], 'low')  !== false) $badgeClass = 'badge-low';
+              if (stripos($row['stock_status'], 'out')  !== false) {
+                $badgeClass = 'badge-out';
+                $btnClass   = 'out-of-stock';
+                $btnText    = '<i class="bi bi-x-circle"></i> Out of Stock';
+              }
+            ?>
+
+            <div class="col-lg-4 col-md-6 product-item"
+                 data-size="<?= htmlspecialchars($row['size_category']) ?>"
+                 data-status="<?= htmlspecialchars($row['stock_status']) ?>"
+                 data-aos="fade-up">
+              <div class="product-card">
+
+                <div class="product-img-wrap">
+                  <?php
+                    $img_src = (!empty($row['image']) && file_exists('uploads/' . $row['image']))
+                      ? 'uploads/' . htmlspecialchars($row['image'])
+                      : 'assets/img/fish.jpeg';
+                  ?>
+                  <img src="<?= $img_src ?>"
+                       alt="<?= htmlspecialchars($row['fish_name']) ?>"
+                       onerror="this.src='assets/img/fish.jpeg'">
+                  <span class="stock-badge <?= $badgeClass ?>">
+                    <?= htmlspecialchars($row['stock_status']) ?>
+                  </span>
+                </div>
+
+                <div class="product-body">
+                  <span class="product-tag">
+                    <i class="bi bi-droplet-fill"></i> Premium Stock
+                  </span>
+
+                  <div class="product-name"><?= htmlspecialchars($row['fish_name']) ?></div>
+
+                  <div class="product-meta">
+                    <span><i class="bi bi-fish"></i> <strong>Species:</strong> &nbsp;<?= htmlspecialchars($row['species']) ?></span>
+                    <span><i class="bi bi-rulers"></i> <strong>Size:</strong> &nbsp;<?= htmlspecialchars($row['size_category']) ?></span>
+                    <span><i class="bi bi-speedometer2"></i> <strong>Weight:</strong> &nbsp;<?= htmlspecialchars($row['weight_range']) ?></span>
+                  </div>
+
+                  <div class="product-price">
+                    ₦<?= number_format($row['price_min']) ?> – ₦<?= number_format($row['price_max']) ?>
+                  </div>
+
+                  <hr class="product-divider">
+
+                  <button
+                    class="btn-addcart <?= $btnClass ?>"
+                    data-product-id="<?= $row['id'] ?>"
+                    data-fish-name="<?= htmlspecialchars($row['fish_name']) ?>"
+                    <?= $btnClass === 'out-of-stock' ? 'disabled' : '' ?>
+                  >
+                    <?= $btnText ?>
+                  </button>
+
+                  <a href="view-more.php?id=<?= $row['id'] ?>" class="btn-viewmore">
+                    <i class="bi bi-eye"></i> View Details
+                  </a>
+                </div>
+
+              </div>
+            </div>
+
+          <?php endwhile; ?>
+
+        <?php else: ?>
+          <div class="col-12">
+            <div class="empty-box" data-aos="fade-up">
+              <i class="bi bi-basket"></i>
+              <h3>No Fish Available Yet</h3>
+              <p style="color:var(--fn-muted);">Products will appear here once added from the admin dashboard.</p>
+              <a href="index.php" style="display:inline-block;margin-top:16px;padding:12px 24px;background:var(--fn-green);color:#fff;border-radius:12px;text-decoration:none;font-weight:600;font-family:'Raleway',sans-serif;">
+                Back to Home
+              </a>
+            </div>
+          </div>
+        <?php endif; ?>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="fn-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <a href="index.php" style="display:flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:14px;">
+          <img src="assets/img/fish.jpeg" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--fn-green);" alt="">
+          <span style="font-family:'Raleway',sans-serif;font-weight:700;font-size:1.1rem;color:#fff;">Fish<span style="color:#45A80D;">Nation</span><span style="color:#7ef29d;">.</span></span>
+        </a>
+        <p>FishNation supplies healthy, disease-free fingerlings to help fish farmers reduce mortality and increase profit.</p>
+        <div class="social-links mt-3">
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+          <a href="#"><i class="bi bi-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.php">Home</a></li>
+          <li><a href="index.php#about">About</a></li>
+          <li><a href="shop.php">Shop</a></li>
+          <li><a href="tools.php">Farm Tools</a></li>
+          <li><a href="checkout.php">Checkout</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="index.php#contact">Contact Us</a></li>
+          <li><a href="payment.php">Payment Info</a></li>
+          <li><a href="login.php">Login</a></li>
+          <li><a href="register.php">Register</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <h4>Stay Updated</h4>
+        <p>Get updates on new stock and fish availability.</p>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input type="email" id="shop-nl-email" placeholder="Your email"
+            style="flex:1;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--fn-border);border-radius:10px;color:#d8f3dc;font-size:0.85rem;outline:none;">
+          <button onclick="shopNewsletter()"
+            style="padding:10px 14px;background:var(--fn-green);border:none;border-radius:10px;color:#fff;cursor:pointer;font-size:14px;">
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fn-footer-bottom container">
+    <p>© <?= date('Y') ?> <strong style="color:#fff;">FishNation</strong>. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+  <i class="bi bi-arrow-up-short"></i>
+</a>
+<div id="preloader"></div>
+
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/aos/aos.js"></script>
+<script src="assets/js/main.js"></script>
+
+<script>
+  AOS.init({ duration: 600, once: true });
+
+  // ── Toastify helper ──────────────────────────────────────────
+  function toast(msg, ok) {
+    Toastify({
+      text: msg,
+      duration: 3500,
+      close: true,
+      gravity: 'bottom',
+      position: 'right',
+      stopOnFocus: true,
+      style: {
+        background: ok
+          ? 'linear-gradient(135deg,#1f7a3d,#45A80D)'
+          : 'linear-gradient(135deg,#b91c1c,#e85555)',
+        borderRadius: '12px',
+        fontFamily: "'Inter', sans-serif",
+        fontSize: '14px',
+        fontWeight: '500',
+        padding: '13px 20px',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+      }
+    }).showToast();
+  }
+
+  // ── Cart pill bump ───────────────────────────────────────────
+  function bumpPill(count) {
+    const el = document.getElementById('cart-count');
+    if (!el) return;
+    el.textContent = count;
+    el.setAttribute('data-zero', count == 0 ? 'true' : 'false');
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+  }
+
+  // ── Add to cart ──────────────────────────────────────────────
+  document.querySelectorAll('.btn-addcart:not(.out-of-stock)').forEach(btn => {
+    btn.addEventListener('click', async function () {
+      const id   = this.dataset.productId;
+      const name = this.dataset.fishName;
+      const orig = this.innerHTML;
+
+      this.classList.add('loading');
+      this.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+
+      try {
+        const fd = new FormData();
+        fd.append('product_id', id);
+        fd.append('action', 'add');
+
+        const res  = await fetch('cart-actions.php', {
+          method: 'POST', body: fd,
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          bumpPill(data.cart_count);
+          toast('✓ ' + name + ' added to cart!', true);
+          this.innerHTML = '<i class="bi bi-check-circle-fill"></i> Added!';
+          setTimeout(() => { this.innerHTML = orig; }, 1800);
+        } else {
+          toast(data.message || 'Could not add item.', false);
+          this.innerHTML = orig;
+        }
+      } catch (err) {
+        toast('Network error — please try again.', false);
+        this.innerHTML = orig;
+      } finally {
+        this.classList.remove('loading');
+      }
+    });
+  });
+
+  // ── Filter ───────────────────────────────────────────────────
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const f = this.dataset.filter;
+
+      document.querySelectorAll('.product-item').forEach(item => {
+        if (f === 'all') {
+          item.style.display = '';
+        } else if (f === 'In Stock') {
+          item.style.display = item.dataset.status.toLowerCase().includes('out') ? 'none' : '';
+        } else {
+          item.style.display = item.dataset.size === f ? '' : 'none';
+        }
+      });
+    });
+  });
+
+  // ── Newsletter ───────────────────────────────────────────────
+  async function shopNewsletter() {
+    const email = document.getElementById('shop-nl-email').value.trim();
+    if (!email) { toast('Please enter your email.', false); return; }
+
+    const fd = new FormData();
+    fd.append('email', email);
+    try {
+      const res  = await fetch('actions/newsletter-submit.php', {
+        method: 'POST', body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      const data = await res.json();
+      toast(data.success ? '✓ Subscribed!' : (data.message || 'Could not subscribe.'), data.success);
+      if (data.success) document.getElementById('shop-nl-email').value = '';
+    } catch {
+      toast('Network error.', false);
+    }
+  }
+</script>
+
+</body>
+</html>
